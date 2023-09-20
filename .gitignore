@@ -1,0 +1,9 @@
+# Ignoruj folder node_modules
+node_modules/
+
+# Ignoruj plik konfiguracyjny
+my-config.yml
+
+# Ignoruj wszystkie pliki .log
+*.log
+*.env
