@@ -143,11 +143,12 @@ exports.findById = async ({ id, model }) => {
     .catch(() => {});
 };
 
-exports.findByData = async ({ data, model }) => {
+exports.findOneByData = async ({ data, model }) => {
+
   return await model
     .where(data)
     .fetch()
-    .then(response => {
+    .then((response) => {
       if (response) {
         return response.toJSON();
       }
@@ -170,18 +171,33 @@ const adjustPayload = payload => {
 };
 
 exports.save = async ({ data, model, callback }) => {
-  const adjustedData = adjustPayload(data);
+  try {
+    let instance;
 
-  return await model
-    .forge(adjustedData)
-    .save()
-    .then(response => {
-      if (callback) {
-        return callback(response);
-      } else {
-        return response.toJSON();
+    // Jeśli `data` zawiera `id`, próbujemy zaktualizować istniejący rekord
+    if (data.id) {
+      instance = await model.where({ id: data.id }).fetch();
+
+      // Jeśli rekord nie istnieje, zwracamy błąd
+      if (!instance) {
+        throw new Error("Nie znaleziono rekordu o podanym ID.");
       }
-    });
+    } else {
+      // W przeciwnym razie tworzymy nową instancję modelu
+      instance = model.forge();
+    }
+
+    const adjustedData = adjustPayload(data);
+    const savedInstance = await instance.save(adjustedData);
+
+    if (callback) {
+      return callback(savedInstance);
+    } else {
+      return savedInstance.toJSON();
+    }
+  } catch (error) {
+    throw error;
+  }
 };
 
 exports.OdevTimestamp = {

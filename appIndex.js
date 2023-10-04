@@ -10,7 +10,7 @@ moment.tz.setDefault("Europe/Warsaw");
 app.use(cors({ origin: "*" }));
 
 app.use(
-  bodyParser.json({ type: "application/x-www-form-urlencoded", limit: "50mb" })
+  bodyParser.json({  limit: "50mb" })
 );
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 
