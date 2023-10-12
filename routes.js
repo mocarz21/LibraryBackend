@@ -11,7 +11,7 @@ const router = express.Router();
 // };
 
 const authenticate = (req, res, next) => {
-  const authHeader = req.headers["access-token"];
+  const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(" ")[1];
   if (token === null) return res.sendStatus(401);
 
@@ -22,18 +22,21 @@ const authenticate = (req, res, next) => {
       });
 
     req.userId = decoded.userId;
-
     next();
   });
 };
 
 const BooksController = require("./controllers/books");
 router.get("/books/", BooksController.showAll);
+router.post("/secure/books", BooksController.save)
+router.post("/secure/books/:id/remove", BooksController.remove)
 
 const UserController = require("./controllers/users");
 router.get("/users/", authenticate, UserController.showAll)
 router.post("/authenticate", UserController.authenticate);
 router.get("/secure/isLogged/:token", UserController.isLogged);
-router.post("/secure/employee/addUser", UserController.save )
+router.post("/secure/employee/addUser", UserController.save)
+router.get("/users/:id", UserController.showOne) 
+router.post("/secure/users/:id/remove", UserController.remove) 
 
 module.exports = router;

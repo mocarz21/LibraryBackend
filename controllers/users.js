@@ -1,10 +1,49 @@
 const { Users, Employees } = require('../models')
 const SqlGo = require('../utils/SqlGo')
 const bcrypt = require("bcrypt");
-const { findOneByData, findById, save } = require("../helpers");
+const { findOneByData, findById, save, removeById } = require("../helpers");
 const  jwt = require("jsonwebtoken");
 const dotenv =  require("dotenv");
 const { pick } = require("lodash");
+
+exports.showOne = async (req, res) =>{
+  
+  try{
+    const { id } = req.params
+
+    if(id) {
+      const user = await findById({
+        id: id,
+        model: Users,
+      });
+      console.log('userrrrrrr',user)
+      res.json({
+        status: "success",
+        body: {
+          id: user.id,
+          firstName: user.imie,
+          lastName: user.nazwisko,
+          email: user.email,
+          bookId: user.id_ksiazki,
+          pesel: user.pesel,
+          avatar: user.avatar,
+          city: user.miasto,
+          streetName: user.ulica,
+          homeNr: user.nr_domu,
+          birthday: user.data_urodzenia,
+          cardNumber: user.nr_karty_bibliotecznej,
+          source: user.source,
+        }
+      })
+    }  
+  }catch(error) {
+    res.json({
+      status: "error",
+      message: "Wystąpił błąd " + error
+    })
+  }
+
+};
 
 
 exports.showAll = async (req, res) => {
@@ -200,4 +239,9 @@ exports.save = async (req, res) => {
       message: "Wystąpił błąd: " + error.message
     });
   }
+};
+
+exports.remove = async (req, res) => {
+  const id = req.params.id;
+  removeById({ id: id, model: Users });
 };
