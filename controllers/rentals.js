@@ -1,14 +1,14 @@
-const { Books } = require('../models')
+const { Rentals } = require('../models')
 const SqlGo = require('../utils/SqlGo')
 const { pick } = require('lodash')
-const { findOneByData, findById, save, removeById } = require("../helpers");
+const { findById, save, removeById } = require("../helpers");
 
 exports.showOne = async (req, res) => {
   try {
-    const bookId = req.params.id;
+    const rentalId = req.params.id;
     const response = await findById({
-      id: bookId,
-      model: Books,
+      id: rentalId,
+      model: Rentals,
     });
     res.json({
       status: "success",
@@ -18,7 +18,7 @@ exports.showOne = async (req, res) => {
     res.json({
       status: "error",
       data: {},
-      message: `Nie udało się pobrać książki. ErrorMessage: ${error}`,
+      message: `Nie udało się pobrać wypozyczenia. ErrorMessage: ${error}`,
     });
   }
 };
@@ -27,7 +27,7 @@ exports.showAll = async (req, res) => {
   try {
     const { query } = req;
 
-    const results = await SqlGo(Books)
+    const results = await SqlGo(Rentals)
       .like("type", query.type)
       .getSeries();
 
@@ -38,7 +38,7 @@ exports.showAll = async (req, res) => {
   } catch (error) {
     res.json({
       status: "error",
-      message: `Nie udało się pobrać słowników. ErrorMessage: ${error}`,
+      message: `Nie udało się pobrać wypozyczeń. ErrorMessage: ${error}`,
     });
   }
 };
@@ -49,31 +49,27 @@ exports.save = async (req, res) =>{
     console.log(body)
     const data = pick(body,[
       "id",
-      "tytul",
-      "autor",
-      "kategoria",
-      "wypozyczono",
-      "data_wypozyczenia",
-      "nazwa_Img",
-      "czytelnik_Id",
-      "rok_wydania",
-      "opis"
+      "id_books",
+      "id_user",
+      "rental_date",
+      "return_date",
+      "approved",
     ])
 
     const processedData = { // zostawiam możliwie do przerobienia podajac dodatkowo id 
       ...data
     };
     await save({
-      model: Books,
+      model: Rentals,
       data: processedData
     })
     res.json({
       status: "success",
-      message: "Książka została dodana"
+      message: "Wypożyczenie dodano"
     })
 
   }catch(error){
-    console.error('błąd podczas zapisywania książki ', error)
+    console.error('błąd podczas zapisywania wypozyczenia ', error)
     res.json({
       status: error,
       message: "Błąd" + error.message
@@ -83,5 +79,5 @@ exports.save = async (req, res) =>{
 
 exports.remove = async (req, res) => {
   const id = req.params.id;
-  removeById({ id: id, model: Books });
+  removeById({ id: id, model: Rentals });
 };

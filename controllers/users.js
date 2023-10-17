@@ -83,14 +83,12 @@ exports.authenticate = async (req, res) => {
       data: { login },
       model: Users,
     });
-    console.log('User1:', user);
 
     if (!user) {
       user = await findOneByData({
         data: { login }, 
         model: Employees,
       });
-      console.log('User2:', user);
     }
 
     if (!user) {

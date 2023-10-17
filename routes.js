@@ -30,6 +30,7 @@ const BooksController = require("./controllers/books");
 router.get("/books/", BooksController.showAll);
 router.post("/secure/books", BooksController.save)
 router.post("/secure/books/:id/remove", BooksController.remove)
+router.get('/books/:id', BooksController.showOne)
 
 const UserController = require("./controllers/users");
 router.get("/users/", authenticate, UserController.showAll)
@@ -38,5 +39,12 @@ router.get("/secure/isLogged/:token", UserController.isLogged);
 router.post("/secure/employee/addUser", UserController.save)
 router.get("/users/:id", UserController.showOne) 
 router.post("/secure/users/:id/remove", UserController.remove) 
+
+const RentalsController = require('./controllers/rentals');
+router.get('/rental', RentalsController.showAll);
+router.post('/secure/rental', RentalsController.save );
+router.get('/secure/rental/:id', RentalsController.showOne);
+router.post('/secure/rental/:id/remove', RentalsController.remove);
+
 
 module.exports = router;
