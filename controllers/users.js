@@ -16,7 +16,7 @@ exports.showOne = async (req, res) =>{
         id: id,
         model: Users,
       });
-      console.log('userrrrrrr',user)
+      
       res.json({
         status: "success",
         body: {
@@ -74,7 +74,6 @@ exports.showAll = async (req, res) => {
 };
 
 exports.authenticate = async (req, res) => {
-  console.log('req.body:', req.body);
   try {
     const { login, password } = req.body; 
 
@@ -146,55 +145,69 @@ exports.authenticate = async (req, res) => {
 
 exports.isLogged = async (req, res) => {
   try {
-
     const { token } = req.params;
     let id;
+    let user; // Przesunięcie deklaracji zmiennej na początek funkcji
 
     jwt.verify(token, process.env.TOKEN_SECRET, (err, decodedToken) => {
-      if(err) {
-        console.log("Weryfikacja tokenu nieudana " + err)
+      if (err) {
+        console.log("Weryfikacja tokenu nieudana " + err);
       } else {
         id = decodedToken.userId;
       }
     });
 
-    if(id) {
-      const user = await findById({
+    if (id) {
+      user = await findById({
         id,
         model: Users,
       });
-      res.json({
-        status: "success",
-        body: {
-          id: user.id,
-          firstName: user.imie,
-          lastName: user.nazwisko,
-          email: user.email,
-          bookId: user.id_ksiazki,
-          pesel: user.pesel,
-          avatar: user.avatar,
-          city: user.miasto,
-          streetName: user.ulica,
-          homeNr: user.nr_domu,
-          birthday: user.data_urodzenia,
-          cardNumber: user.nr_karty_bibliotecznej,
-          source: user.source,
-        }
-      })
+
+      if (!user) {
+        user = await findById({
+          id,
+          model: Employees,
+        });
+      }
+
+      if (user) {
+        res.json({
+          status: "success",
+          body: {
+            id: user.id,
+            firstName: user.imie,
+            lastName: user.nazwisko,
+            email: user.email,
+            bookId: user.id_ksiazki,
+            pesel: user.pesel,
+            avatar: user.avatar,
+            city: user.miasto,
+            streetName: user.ulica,
+            homeNr: user.nr_domu,
+            birthday: user.data_urodzenia,
+            cardNumber: user.nr_karty_bibliotecznej,
+            source: user.source,
+          }
+        });
+      } else {
+        res.json({
+          status: "error",
+          message: "Brak użytkownika o podanym ID"
+        });
+      }
     } else {
       res.json({
         status: "error",
         message: "Użytkownik nie istnieje"
-      })
+      });
     }
-
-  } catch(error) {
+  } catch (error) {
     res.json({
       status: "error",
       message: "Wystąpił błąd " + error
-    })
+    });
   }
-}
+};
 
 exports.save = async (req, res) => {
   try {

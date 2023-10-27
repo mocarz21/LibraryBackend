@@ -46,5 +46,10 @@ router.post('/secure/rental', RentalsController.save );
 router.get('/secure/rental/:id', RentalsController.showOne);
 router.post('/secure/rental/:id/remove', RentalsController.remove);
 
+const ImgController = require('./controllers/img');
+router.post('/upload/img/:name', ImgController.save)
+router.get('/download/img/:filename', ImgController.getOne)
+router.get('/download/img', ImgController.getAll)
+
 
 module.exports = router;
