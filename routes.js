@@ -38,7 +38,8 @@ router.post("/authenticate", UserController.authenticate);
 router.get("/secure/isLogged/:token", UserController.isLogged);
 router.post("/secure/employee/addUser", UserController.save)
 router.get("/users/:id", UserController.showOne) 
-router.post("/secure/users/:id/remove", UserController.remove) 
+router.post("/secure/users/:id/remove", UserController.remove)
+router.post("/authenticate/:id",UserController.password) 
 
 const RentalsController = require('./controllers/rentals');
 router.get('/rental', RentalsController.showAll);

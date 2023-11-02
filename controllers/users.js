@@ -45,6 +45,62 @@ exports.showOne = async (req, res) =>{
 
 };
 
+exports.password = async(req, res) =>{
+  const saltRounds = 10
+
+
+
+  const plainTextPassword = "twoje-haslo"; // Tutaj podaj hasło w formie tekstowej
+  
+  // Zahaszuj hasło
+  const hashedPasswordOne = await bcrypt.hash('', saltRounds);
+  const hashedPasswordTwo = await bcrypt.hash('admin', saltRounds);
+
+  console.log('hashedPasswordOne ', hashedPasswordOne)
+  console.log('hashedPasswordTwo ', hashedPasswordTwo)
+
+
+
+
+
+
+
+
+
+
+
+
+
+  try {
+    const { id } = req.params;
+    const { password } = req.body; 
+
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    console.log('hashedPassword', hashedPassword)
+
+    const user = await findById({
+      id: id,
+      model: Users,
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "Użytkownik nie istnieje" });
+    }
+
+    await save({
+      model: Users,
+      data: {id: id, password: hashedPassword}
+    });
+
+    res.json({
+      status: "success",
+      message: "Hasło użytkownika zostało zaktualizowane."
+    });
+  } catch (error) {
+    console.error("Błąd podczas aktualizacji hasła użytkownika:", error);
+    res.status(500).json({ message: "Wystąpił błąd: " + error.message });
+  }
+};
 
 exports.showAll = async (req, res) => {
   dotenv.config()
@@ -79,24 +135,26 @@ exports.authenticate = async (req, res) => {
 
     // Sprawdzamy, czy istnieje użytkownik o podanym loginie
     let user = await findOneByData({
-      data: { login },
+      data: { pesel: login },
       model: Users,
     });
 
     if (!user) {
       user = await findOneByData({
-        data: { login }, 
+        data: { pesel: login }, 
         model: Employees,
       });
     }
-
+    console.log(login, password)
+    console.log('user',user)
     if (!user) {
       return res.status(401).json({ message: "Nieprawidłowy login" });
     }
 
-    // Sprawdzamy, czy hasło jest poprawne
-    //const passwordMatch = await bcrypt.compare(password, user.password);
-    if (password === user.password) {
+    //Sprawdzamy, czy hasło jest poprawne
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    console.log('passwordMatch', passwordMatch)
+    if (passwordMatch) {
 
       //Generujemy token JWT dla zalogowanego użytkownika
 
@@ -212,6 +270,8 @@ exports.isLogged = async (req, res) => {
 exports.save = async (req, res) => {
   try {
     const { userId, body } = req;
+
+    console.log('body',body)
 
     const data = pick(body, [
       "id",

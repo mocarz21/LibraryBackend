@@ -46,7 +46,6 @@ exports.showAll = async (req, res) => {
 exports.save = async (req, res) =>{
   try{
    const { body } = req // zostawiam możliwie do przerobienia podajac dodatkowo id
-    console.log(body)
     const data = pick(body,[
       "id",
       "id_books",
